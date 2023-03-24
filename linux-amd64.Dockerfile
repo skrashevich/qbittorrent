@@ -8,7 +8,8 @@ ARG FULL_VERSION
 #ENV qbt_build_tool ${qbt_build_tool}
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update && apt install -y curl
+RUN apt update --allow-insecure-repositories && apt install -y --no-install-recommends ca-certificates curl 
+RUN update-ca-certificates
 WORKDIR /build12
 ENV libtorrent_version "1.2"
 RUN curl -sL git.io/qbstatic | bash -s all -qt ${FULL_VERSION} -i -c -b "/build12"
