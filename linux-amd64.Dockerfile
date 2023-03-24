@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:labs
 ARG UPSTREAM_IMAGE
 ARG UPSTREAM_DIGEST_AMD64
 
@@ -32,9 +32,9 @@ RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/ma
 #ARG FULL_VERSION
 
 #RUN curl -fsSL "https://github.com/userdocs/qbittorrent-nox-static/releases/download/${FULL_VERSION}/x86_64-qbittorrent-nox" > "${APP_DIR}/qbittorrent-nox" && \
-COPY --from=builder /build12/bin/qbittorrent-nox ${APP_DIR}/qbittorrent-nox
-COPY --from=builder /build20/bin/qbittorrent-nox ${APP_DIR}/qbittorrent-nox-libtorrent20
-RUN chmod 755 "${APP_DIR}/qbittorrent-nox"
+COPY --from=builder --link /build12/bin/qbittorrent-nox ${APP_DIR}/qbittorrent-nox-libtorrent12
+COPY --from=builder --link /build20/bin/qbittorrent-nox ${APP_DIR}/qbittorrent-nox-libtorrent20
+RUN chmod 755 "${APP_DIR}/qbittorrent-nox-libtorrent12" && ln -s "$APP_DIR/qbittorrent-nox-libtorrent12" "$APP_DIR/qbittorrent"
 RUN chmod 755 "${APP_DIR}/qbittorrent-nox-libtorrent20"
 
 ARG VUETORRENT_VERSION
@@ -45,3 +45,6 @@ RUN curl -fsSL "https://github.com/wdaan/vuetorrent/releases/download/v${VUETORR
 
 COPY root/ /
 RUN chmod -R +x /etc/cont-init.d/ /etc/services.d/ /etc/cont-finish.d/
+ADD --link https://raw.githubusercontent.com/nbusseneau/qBittorrent-RuTracker-plugin/master/rutracker.py /config/data/nova3/rutracker.py
+
+ENV LIBTORRENTVER=12
