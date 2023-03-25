@@ -38,13 +38,21 @@ FROM builder-base as builder12
 ARG FULL_VERSION
 WORKDIR /build12
 ENV qbt_libtorrent_version "1.2"
-RUN --mount=type=cache,target=/build12/qbt-build /qbittorrent-nox-static.sh -s all -qt ${FULL_VERSION} -i -c -b "/build12"
+RUN --mount=type=cache,target=/build12/qbt-build <<EOT
+  mkdir -p ./qbt-build/patches/qbittorrent/${FULL_VERSION}
+  curl -sL https://github.com/qbittorrent/qBittorrent/pull/18612.patch > ./qbt-build/patches/qbittorrent/${FULL_VERSION}/optimize-sqlite-database.patch
+  /qbittorrent-nox-static.sh -s all -qt ${FULL_VERSION} -i -c -b "/build12"
+EOT
 
 FROM builder-base as builder20
 ARG FULL_VERSION
 WORKDIR /build20
 ENV qbt_libtorrent_version "2.0"
-RUN --mount=type=cache,target=/build20/qbt-build /qbittorrent-nox-static.sh -s all -qt ${FULL_VERSION} -i -c -b "/build20"
+RUN --mount=type=cache,target=/build20/qbt-build <<EOT
+  mkdir -p ./qbt-build/patches/qbittorrent/${FULL_VERSION}
+  curl -sL https://github.com/qbittorrent/qBittorrent/pull/18612.patch > ./qbt-build/patches/qbittorrent/${FULL_VERSION}/optimize-sqlite-database.patch
+  /qbittorrent-nox-static.sh -s all -qt ${FULL_VERSION} -i -c -b "/build20"
+EOT
 
 FROM ${UPSTREAM_IMAGE}@${UPSTREAM_DIGEST_AMD64}
 EXPOSE 8080
@@ -63,8 +71,7 @@ RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/ma
 #RUN curl -fsSL "https://github.com/userdocs/qbittorrent-nox-static/releases/download/${FULL_VERSION}/x86_64-qbittorrent-nox" > "${APP_DIR}/qbittorrent-nox" && \
 COPY --from=builder12 --link /build12/bin/qbittorrent-nox ${APP_DIR}/qbittorrent-nox-libtorrent12
 COPY --from=builder20 --link /build20/bin/qbittorrent-nox ${APP_DIR}/qbittorrent-nox-libtorrent20
-RUN chmod 755 "${APP_DIR}/qbittorrent-nox-libtorrent12" && ln -s "$APP_DIR/qbittorrent-nox-libtorrent12" "$APP_DIR/qbittorrent"
-RUN chmod 755 "${APP_DIR}/qbittorrent-nox-libtorrent20"
+RUN chmod 755 "${APP_DIR}/qbittorrent-nox-libtorrent12" "${APP_DIR}/qbittorrent-nox-libtorrent20" && ln -s "$APP_DIR/qbittorrent-nox-libtorrent12" "$APP_DIR/qbittorrent"
 
 ARG VUETORRENT_VERSION
 RUN curl -fsSL "https://github.com/wdaan/vuetorrent/releases/download/v${VUETORRENT_VERSION}/vuetorrent.zip" > "/tmp/vuetorrent.zip" && \
@@ -72,7 +79,7 @@ RUN curl -fsSL "https://github.com/wdaan/vuetorrent/releases/download/v${VUETORR
     rm "/tmp/vuetorrent.zip" && \
     chmod -R u=rwX,go=rX "${APP_DIR}/vuetorrent"
 
-COPY --link --from=qb-web-builder /src/dist/public ${APP_DIR}/qb-web
+COPY --link --from=qb-web-builder /src/dist ${APP_DIR}/qb-web
 
 COPY root/ /
 RUN chmod -R +x /etc/cont-init.d/ /etc/services.d/ /etc/cont-finish.d/
