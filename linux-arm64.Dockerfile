@@ -27,11 +27,11 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   libtext-unidecode-perl libtimedate-perl libtool libtry-tiny-perl liburi-perl libwww-perl libwww-robotrules-perl libxml-libxml-perl libxml-namespacesupport-perl libxml-parser-perl \
   libxml-sax-base-perl libxml-sax-expat-perl libxml-sax-perl perl-openssl-defaults tex-common texinfo
 WORKDIR /build12
-ENV libtorrent_version "1.2"
+ENV qbt_libtorrent_version "1.2"
 RUN curl -sL git.io/qbstatic | sed -e 's/ftp.gnu.org/mirrors.kernel.org/g' | bash -s all -qt ${FULL_VERSION} -i -c -b "/build12"
 
 WORKDIR /build20
-ENV libtorrent_version "2.0"
+ENV qbt_libtorrent_version "2.0"
 RUN curl -sL git.io/qbstatic | sed -e 's/ftp.gnu.org/mirrors.kernel.org/g' | bash -s all -qt ${FULL_VERSION} -i -c -b "/build20"
 
 
