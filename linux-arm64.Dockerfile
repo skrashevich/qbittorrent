@@ -3,6 +3,12 @@ ARG UPSTREAM_IMAGE
 ARG UPSTREAM_DIGEST_ARM64
 ARG FULL_VERSION
 
+FROM --platform=$BUILDPLATFORM node:16 as qb-web-builder
+ADD https://github.com/CzBiX/qb-web.git /src
+WORKDIR /src
+RUN yarn install
+RUN yarn run build
+
 FROM ubuntu:latest as builder-base
 ENV qbt_build_tool qmake
 ENV qbt_cross_name aarch64
@@ -65,6 +71,8 @@ RUN curl -fsSL "https://github.com/wdaan/vuetorrent/releases/download/v${VUETORR
     unzip "/tmp/vuetorrent.zip" -d "${APP_DIR}" && \
     rm "/tmp/vuetorrent.zip" && \
     chmod -R u=rwX,go=rX "${APP_DIR}/vuetorrent"
+
+COPY --link --from=qb-web-builder /src/dist/public ${APP_DIR}/qb-web
 
 COPY root/ /
 RUN chmod -R +x /etc/cont-init.d/ /etc/services.d/ /etc/cont-finish.d/
