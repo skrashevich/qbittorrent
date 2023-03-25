@@ -32,18 +32,19 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   libio-socket-ssl-perl libltdl-dev libltdl7 liblwp-mediatypes-perl liblwp-protocol-https-perl libmagic-mgc libmagic1 libmailtools-perl libnet-http-perl libnet-smtp-ssl-perl libnet-ssleay-perl \
   libtext-unidecode-perl libtimedate-perl libtool libtry-tiny-perl liburi-perl libwww-perl libwww-robotrules-perl libxml-libxml-perl libxml-namespacesupport-perl libxml-parser-perl \
   libxml-sax-base-perl libxml-sax-expat-perl libxml-sax-perl perl-openssl-defaults tex-common texinfo
+ADD qbittorrent-nox-static.sh /qbittorrent-nox-static.sh
 
 FROM builder-base as builder12
 ARG FULL_VERSION
 WORKDIR /build12
 ENV qbt_libtorrent_version "1.2"
-RUN --mount=type=cache,target=/build12/qbt-build curl -sL git.io/qbstatic | sed -e 's/ftp.gnu.org/mirrors.kernel.org/g' | bash -s all -qt ${FULL_VERSION} -i -c -b "/build12"
+RUN --mount=type=cache,target=/build12/qbt-build /qbittorrent-nox-static.sh -s all -qt ${FULL_VERSION} -i -c -b "/build12"
 
 FROM builder-base as builder20
 ARG FULL_VERSION
 WORKDIR /build20
 ENV qbt_libtorrent_version "2.0"
-RUN --mount=type=cache,target=/build20/qbt-build curl -sL git.io/qbstatic | sed -e 's/ftp.gnu.org/mirrors.kernel.org/g' | bash -s all -qt ${FULL_VERSION} -i -c -b "/build20"
+RUN --mount=type=cache,target=/build20/qbt-build /qbittorrent-nox-static.sh -s all -qt ${FULL_VERSION} -i -c -b "/build20"
 
 FROM ${UPSTREAM_IMAGE}@${UPSTREAM_DIGEST_AMD64}
 EXPOSE 8080
