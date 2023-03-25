@@ -8,15 +8,31 @@ ENV qbt_build_tool qmake
 ENV qbt_cross_name aarch64
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update --allow-insecure-repositories && apt install -y --no-install-recommends ca-certificates curl 
+RUN rm -f /etc/apt/apt.conf.d/docker-clean \
+  && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' >/etc/apt/apt.conf.d/keep-cache
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  --mount=type=cache,target=/var/lib/apt,sharing=locked \
+  apt update --allow-insecure-repositories
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  --mount=type=cache,target=/var/lib/apt,sharing=locked \
+  apt install -y --no-install-recommends ca-certificates
 RUN update-ca-certificates
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  --mount=type=cache,target=/var/lib/apt,sharing=locked \
+  apt install -y curl build-essential git python3 python3-dev python3-numpy automake pkg-config gawk bison file gettext gettext-base libauthen-sasl-perl \
+  libclone-perl libdata-dump-perl libencode-locale-perl libfile-listing-perl libfont-afm-perl libhtml-form-perl libhtml-format-perl \
+  libhtml-parser-perl libhtml-tagset-perl libhtml-tree-perl libhttp-cookies-perl libhttp-daemon-perl libhttp-date-perl libhttp-message-perl libhttp-negotiate-perl libio-html-perl \
+  libio-socket-ssl-perl libltdl-dev libltdl7 liblwp-mediatypes-perl liblwp-protocol-https-perl libmagic-mgc libmagic1 libmailtools-perl libnet-http-perl libnet-smtp-ssl-perl libnet-ssleay-perl \
+  libtext-unidecode-perl libtimedate-perl libtool libtry-tiny-perl liburi-perl libwww-perl libwww-robotrules-perl libxml-libxml-perl libxml-namespacesupport-perl libxml-parser-perl \
+  libxml-sax-base-perl libxml-sax-expat-perl libxml-sax-perl perl-openssl-defaults tex-common texinfo
 WORKDIR /build12
 ENV libtorrent_version "1.2"
-RUN curl -sL git.io/qbstatic | bash -s all -qt ${FULL_VERSION} -i -c -b "/build12"
+RUN curl -sL git.io/qbstatic | sed -e 's/ftp.gnu.org/mirrors.kernel.org/g' | bash -s all -qt ${FULL_VERSION} -i -c -b "/build12"
 
 WORKDIR /build20
 ENV libtorrent_version "2.0"
-RUN curl -sL git.io/qbstatic | bash -s all -qt ${FULL_VERSION} -i -c -b "/build20"
+RUN curl -sL git.io/qbstatic | sed -e 's/ftp.gnu.org/mirrors.kernel.org/g' | bash -s all -qt ${FULL_VERSION} -i -c -b "/build20"
 
 
 FROM ${UPSTREAM_IMAGE}@${UPSTREAM_DIGEST_ARM64}
