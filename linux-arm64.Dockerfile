@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:labs
 ARG UPSTREAM_IMAGE
 ARG UPSTREAM_DIGEST_ARM64
-
-FROM ubuntu:latest as builder
 ARG FULL_VERSION
+
+FROM ubuntu:latest as builder-base
 ENV qbt_build_tool qmake
 ENV qbt_cross_name aarch64
 ENV DEBIAN_FRONTEND=noninteractive
@@ -26,13 +26,18 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   libio-socket-ssl-perl libltdl-dev libltdl7 liblwp-mediatypes-perl liblwp-protocol-https-perl libmagic-mgc libmagic1 libmailtools-perl libnet-http-perl libnet-smtp-ssl-perl libnet-ssleay-perl \
   libtext-unidecode-perl libtimedate-perl libtool libtry-tiny-perl liburi-perl libwww-perl libwww-robotrules-perl libxml-libxml-perl libxml-namespacesupport-perl libxml-parser-perl \
   libxml-sax-base-perl libxml-sax-expat-perl libxml-sax-perl perl-openssl-defaults tex-common texinfo
+
+FROM builder-base as builder12
+ARG FULL_VERSION
 WORKDIR /build12
 ENV qbt_libtorrent_version "1.2"
-RUN curl -sL git.io/qbstatic | sed -e 's/ftp.gnu.org/mirrors.kernel.org/g' | bash -s all -qt ${FULL_VERSION} -i -c -b "/build12"
+RUN --mount=type=cache,target=/build12/qbt-build curl -sL git.io/qbstatic | sed -e 's/ftp.gnu.org/mirrors.kernel.org/g' | bash -s all -qt ${FULL_VERSION} -i -c -b "/build12"
 
+FROM builder-base as builder20
+ARG FULL_VERSION
 WORKDIR /build20
 ENV qbt_libtorrent_version "2.0"
-RUN curl -sL git.io/qbstatic | sed -e 's/ftp.gnu.org/mirrors.kernel.org/g' | bash -s all -qt ${FULL_VERSION} -i -c -b "/build20"
+RUN --mount=type=cache,target=/build20/qbt-build curl -sL git.io/qbstatic | sed -e 's/ftp.gnu.org/mirrors.kernel.org/g' | bash -s all -qt ${FULL_VERSION} -i -c -b "/build20"
 
 
 FROM ${UPSTREAM_IMAGE}@${UPSTREAM_DIGEST_ARM64}
@@ -50,8 +55,8 @@ RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/ma
 #ARG FULL_VERSION
 
 #RUN curl -fsSL "https://github.com/userdocs/qbittorrent-nox-static/releases/download/${FULL_VERSION}/x86_64-qbittorrent-nox" > "${APP_DIR}/qbittorrent-nox" && \
-COPY --from=builder --link /build12/bin/qbittorrent-nox ${APP_DIR}/qbittorrent-nox-libtorrent12
-COPY --from=builder --link /build20/bin/qbittorrent-nox ${APP_DIR}/qbittorrent-nox-libtorrent20
+COPY --from=builder12 --link /build12/bin/qbittorrent-nox ${APP_DIR}/qbittorrent-nox-libtorrent12
+COPY --from=builder20 --link /build20/bin/qbittorrent-nox ${APP_DIR}/qbittorrent-nox-libtorrent20
 RUN chmod 755 "${APP_DIR}/qbittorrent-nox-libtorrent12" && ln -s "$APP_DIR/qbittorrent-nox-libtorrent12" "$APP_DIR/qbittorrent"
 RUN chmod 755 "${APP_DIR}/qbittorrent-nox-libtorrent20"
 
