@@ -5,4 +5,4 @@ umask "${UMASK}"
 sed -i "s/YOUR_USERNAME_HERE/${RUTRACKER_USERNAME}/" /config/data/nova3/rutracker.py
 sed -i "s/YOUR_PASSWORD_HERE/${RUTRACKER_PASSWORD}/" /config/data/nova3/rutracker.py
 
-exec s6-setuidgid hotio "${APP_DIR}/qbittorrent-nox-libtorrent${LIBTORRENTVER]" --profile="${APP_DIR}" --webui-port="${WEBUI_PORTS%%/*}"
+exec s6-setuidgid hotio "${APP_DIR}/qbittorrent-nox-libtorrent${LIBTORRENTVER}" --profile="${APP_DIR}" --webui-port="${WEBUI_PORTS%%/*}"
