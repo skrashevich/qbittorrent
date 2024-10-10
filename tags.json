@@ -2,25 +2,25 @@
   "legacy": {
     "description": "Fixed to v4.3.9",
     "hide": false,
-    "last_updated": "2024-09-30T23:29:03.000Z",
-    "last_updated_url": "https://github.com/hotio/qbittorrent/actions/runs/11115709745",
+    "last_updated": "2024-10-10T13:41:07.000Z",
+    "last_updated_url": "https://github.com/hotio/qbittorrent/actions/runs/11275237617",
     "latest": false,
     "tags": [
       "legacy",
       "legacy-4.3.9",
-      "legacy-7661123"
+      "legacy-66cc2b9"
     ]
   },
   "release": {
     "description": "Releases",
     "hide": false,
-    "last_updated": "2024-09-30T23:28:50.000Z",
-    "last_updated_url": "https://github.com/hotio/qbittorrent/actions/runs/11115709853",
+    "last_updated": "2024-10-10T13:41:12.000Z",
+    "last_updated_url": "https://github.com/hotio/qbittorrent/actions/runs/11275238043",
     "latest": true,
     "tags": [
       "release",
       "release-5.0.0",
-      "release-0ff32ff"
+      "release-5752f59"
     ]
   }
 }
