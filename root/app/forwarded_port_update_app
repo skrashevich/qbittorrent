@@ -1,9 +1,6 @@
 # shellcheck shell=bash
 
-old_port=$(grep 'Session\\Port' "${CONFIG_DIR}/config/qBittorrent.conf" | awk -F '=' '{print $2}' | xargs)
-if [[ "${old_port}" != "${port}" ]]; then
-    if pid=$(pidof "qbittorrent-nox-lib${LIBTORRENT//v/}"); then
-        log_inf "[QBITTORRENT] Shutting down to restart with forwarded port [${port}]."
-        kill "${pid}"
-    fi
+if pid=$(pidof "qbittorrent-nox-lib${LIBTORRENT//v/}"); then
+    log_inf "[QBITTORRENT] Shutting down to restart with forwarded port [${port}]."
+    kill "${pid}"
 fi
